@@ -16,5 +16,6 @@ func main() {
 		fmt.Printf("PrevHash:     %x\n", b.PrevHash)
 		fmt.Printf("Hash:         %x\n", b.Hash)
 		fmt.Println()
+		fmt.Println()
 	}
 }
