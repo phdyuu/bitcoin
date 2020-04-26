@@ -1,6 +1,9 @@
 package blockchain
 
-import "bitcoin/block"
+import (
+	"bitcoin/block"
+	"bitcoin/pow"
+)
 
 type BlockChain struct {
 	Blocks 		[]*block.Block
@@ -8,12 +11,12 @@ type BlockChain struct {
 
 
 func NewBlockChain(data string) *BlockChain {
-	gnsBlock := block.NewBlock(data, nil)
+	gnsBlock := pow.NewBlock(data, nil)
 	return &BlockChain{[]*block.Block{gnsBlock}}
 }
 
 func (bc *BlockChain) AddBlock(data string) {
 	prevHash := bc.Blocks[len(bc.Blocks)-1].Hash
-	nBlock := block.NewBlock(data, prevHash)
+	nBlock := pow.NewBlock(data, prevHash)
 	bc.Blocks = append(bc.Blocks, nBlock)
 }
