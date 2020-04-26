@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const targetBits = 23
+const targetBits = 20
 
 type ProofOfWork struct {
 	b 			*block.Block
