@@ -2,6 +2,7 @@ package pow
 
 import (
 	"bitcoin/block"
+	"bitcoin/transaction"
 	"bytes"
 	"crypto/sha256"
 	"fmt"
@@ -27,8 +28,8 @@ func NewPoW(b *block.Block) *ProofOfWork {
 func (pow *ProofOfWork) PrepareData(nonce int64) []byte {
 	data := bytes.Join([][]byte{
 		[]byte(strconv.FormatInt(pow.b.TimeStamp, 10)),
-		[]byte(pow.b.Data),
 		[]byte(strconv.FormatInt(nonce, 10)),
+		pow.b.HashTransactions(),
 		pow.b.PrevHash,
 	}, []byte{})
 	return data
@@ -54,17 +55,25 @@ func (pow *ProofOfWork) Run() (int64, []byte) {
 	return nonce, hash[:]
 }
 
-func NewBlock(data string, prevHash []byte) *block.Block {
+func NewBlock(transactions []*transaction.Transaction, prevHash []byte) *block.Block {
 	b := &block.Block{
-		TimeStamp: time.Now().Unix(),
-		Data:      data,
-		PrevHash:  prevHash,
-		Hash:      nil,
-		Nonce:     0,
+		TimeStamp:	 		time.Now().Unix(),
+		Transactions:     	transactions,
+		PrevHash:  			prevHash,
+		Hash:      			nil,
+		Nonce:     			0,
 	}
 	pw := NewPoW(b)
 	nonce, hash := pw.Run()
 	b.Nonce = nonce
 	b.Hash = hash
 	return b
+}
+
+func (pow *ProofOfWork) Validate() bool {
+	hashInt := big.NewInt(1)
+	data := pow.PrepareData(pow.b.Nonce)
+	hash := sha256.Sum256(data)
+	hashInt.SetBytes(hash[:])
+	return hashInt.Cmp(pow.target) == -1
 }
